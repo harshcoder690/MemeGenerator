@@ -57,6 +57,7 @@ const MemeGenerator = () => {
           placeholder="Top Text"
           value={topText}
           onChange={handleChange1}
+          autocomplete="off" 
         />
         <input
           type="text"
@@ -64,6 +65,7 @@ const MemeGenerator = () => {
           placeholder="Bottom Text"
           value={bottomText}
           onChange={handleChange2}
+          autocomplete="off" 
         />
 
         <button>Change Photo</button>
