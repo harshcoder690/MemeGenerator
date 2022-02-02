@@ -1,43 +1,39 @@
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
 import html2canvas from "html2canvas";
 
-class MemeGenerator extends Component {
-  constructor() {
-    super();
-    this.state = {
-      topText: "",
-      bottomText: "",
-      randomImg: "http://i.imgflip.com/1bij.jpg",
-      allMemeImgs: [],
-    };
-    this.handleChange = this.handleChange.bind(this);
-    this.randomMeme = this.randomMeme.bind(this);
-    this.capture = this.capture.bind(this);
-  }
+const MemeGenerator = () => {
+  const [topText , setTopText] = useState("");
+  const [bottomText , setbottomText] = useState("");
+  const [allMemeImgs , setallMemeImgs] = useState([]);
+  const [randomImg , setrandomImg] = useState("http://i.imgflip.com/1bij.jpg");
 
-  componentDidMount() {
+
+  useEffect(() => {
     fetch("https://api.imgflip.com/get_memes")
       .then((response) => response.json())
       .then((response) => {
         const { memes } = response.data;
-        this.setState({ allMemeImgs: memes });
+        setallMemeImgs(memes);
       });
+  }, []);
+
+  const handleChange1 = (event) => {
+    const s = event.target.value;
+    setTopText(s);
+  }
+  const handleChange2 = (event) => {
+    const s = event.target.value;
+    setbottomText(s);
   }
 
-  handleChange(event) {
-    const { name, value } = event.target;
-    this.setState({ [name]: value });
-  }
-
-  randomMeme(event) {
+  const randomMeme = (event) => {
     event.preventDefault();
-    var items = this.state.allMemeImgs;
+    var items = allMemeImgs;
     var item = items[Math.floor(Math.random() * items.length)];
-
-    this.setState({ randomImg: item.url });
+    setrandomImg(item.url);
   }
 
-  capture() {
+  const capture = () => {
     const divToDisplay = document.getElementById("meme");
     html2canvas(divToDisplay, {
       allowTaint: true,
@@ -49,43 +45,39 @@ class MemeGenerator extends Component {
       var link = document.createElement("a");
       link.download = "meme.png";
       link.href = url;
-      console.log(link);
       link.click();
     });
   }
+  return (
+    <div>
+      <form className="meme-form" onSubmit={randomMeme}>
+        <input
+          type="text"
+          name="topText"
+          placeholder="Top Text"
+          value={topText}
+          onChange={handleChange1}
+        />
+        <input
+          type="text"
+          name="bottomText"
+          placeholder="Bottom Text"
+          value={bottomText}
+          onChange={handleChange2}
+        />
 
-  render() {
-    return (
-      <div>
-        <form className="meme-form" onSubmit={this.randomMeme}>
-          <input
-            type="text"
-            name="topText"
-            placeholder="Top Text"
-            value={this.state.topText}
-            onChange={this.handleChange}
-          />
-          <input
-            type="text"
-            name="bottomText"
-            placeholder="Bottom Text"
-            value={this.state.bottomText}
-            onChange={this.handleChange}
-          />
-
-          <button>Change Photo</button>
-        </form>
-        <div id="meme" className="meme">
-          <img src={this.state.randomImg} alt="" />
-          <h2 className="top">{this.state.topText}</h2>
-          <h2 className="bottom">{this.state.bottomText}</h2>
-        </div>
-        <button id="capture" onClick={this.capture}>
-          Download Meme
-        </button>
+        <button>Change Photo</button>
+      </form>
+      <div id="meme" className="meme">
+        <img src={randomImg} alt="" />
+        <h2 className="top">{topText}</h2>
+        <h2 className="bottom">{bottomText}</h2>
       </div>
-    );
-  }
+      <button id="capture" onClick={capture}>
+        Download Meme
+      </button>
+    </div>
+  );
 }
 
 export default MemeGenerator;
